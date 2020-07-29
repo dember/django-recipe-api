@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 
-from core.models import Recipe
+from core.models import Recipe, Ingredient
 
 from recipe import serializers
 
@@ -17,6 +17,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return self.serializer_class
 
-    def perform_create(self, serializer):
-        """Create a new recipe"""
-        serializer.save()
+
+class IngredientViewSet(viewsets.ModelViewSet):
+    """Manage ingredients in the database"""
+    queryset = Ingredient.objects.all()
+    serializer_class = serializers.IngredientSerializer
