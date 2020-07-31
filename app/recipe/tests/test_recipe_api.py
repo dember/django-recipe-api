@@ -80,3 +80,41 @@ class PublicRecipeApiTests(TestCase):
         self.assertEqual(ingredients.count(), 2)
         self.assertIn(ingredient1, ingredients)
         self.assertIn(ingredient2, ingredients)
+
+    def test_filter_recipes_by_name(self):
+        """Test filter recipes by name"""
+        ingredient1 = sample_ingredient(name='Prawns')
+        ingredient2 = sample_ingredient(name='Ginger')
+        payload = {
+            'name': 'Thai prawn red curry',
+            'description': 'Description',
+            'ingredients': [ingredient1.id, ingredient2.id],
+        }
+        res = self.client.post(RECIPES_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        res = self.client.get(RECIPES_URL + '?name=Thai')
+        recipes = Recipe.objects.all().order_by('id')
+        serializer = RecipeSerializer(recipes, many=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+
+    def test_filter_recipes_by_name_with_non_matching_name(self):
+        """Test filter recipes by name"""
+        ingredient1 = sample_ingredient(name='Prawns')
+        ingredient2 = sample_ingredient(name='Ginger')
+        payload = {
+            'name': 'Thai prawn red curry',
+            'description': 'Description',
+            'ingredients': [ingredient1.id, ingredient2.id],
+        }
+        res = self.client.post(RECIPES_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        res = self.client.get(RECIPES_URL + '?name=X')
+        recipes = Recipe.objects.all().order_by('id')
+        serializer = RecipeSerializer(recipes, many=True)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(res.data, serializer.data)

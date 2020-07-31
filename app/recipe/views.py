@@ -17,6 +17,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return self.serializer_class
 
+    def get_queryset(self):
+        queryset = self.queryset
+
+        name = self.request.query_params.get('name')
+        if name:
+            queryset = queryset.filter(name__contains=name)
+
+        return queryset
+
 
 class IngredientViewSet(viewsets.ModelViewSet):
     """Manage ingredients in the database"""
