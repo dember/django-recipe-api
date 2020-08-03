@@ -21,10 +21,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         queryset = self.queryset
 
         name = self.request.query_params.get('name')
-        if name:
-            queryset = queryset.filter(name__contains=name)
 
-        return queryset
+        if name:
+            return queryset.filter(name__contains=name)
+
+        return Recipe.objects.all()
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
