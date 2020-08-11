@@ -8,7 +8,6 @@ from core.models import Recipe, Ingredient
 
 from recipe.serializers import RecipeSerializer
 
-
 RECIPES_URL = reverse('recipe:recipe-list')
 
 
@@ -55,31 +54,31 @@ class PublicRecipeApiTests(TestCase):
         payload = {
             'name': 'Chocolate cheesecake',
             'description': 'Description of chocolate cheesecake',
+            'ingredients': []
         }
-        res = self.client.post(RECIPES_URL, payload)
+        res = self.client.post(RECIPES_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         recipe = Recipe.objects.get(id=res.data['id'])
         for key in payload.keys():
-            self.assertEqual(payload[key], getattr(recipe, key))
+            if key == 'ingredients':
+                self.assertEqual(payload[key], list(getattr(recipe, key).all()))
+            else:
+                self.assertEqual(payload[key], getattr(recipe, key))
 
     def test_create_recipe_with_ingredients(self):
         """Test creating recipe with ingredients"""
-        ingredient1 = sample_ingredient(name='Prawns')
-        ingredient2 = sample_ingredient(name='Ginger')
         payload = {
             'name': 'Thai prawn red curry',
             'description': 'Description',
-            'ingredients': [ingredient1.id, ingredient2.id],
+            'ingredients': [{'name': 'Prawns'}, {'name': 'Ginger'}],
         }
-        res = self.client.post(RECIPES_URL, payload)
+        res = self.client.post(RECIPES_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         recipe = Recipe.objects.get(id=res.data['id'])
         ingredients = recipe.ingredients.all()
         self.assertEqual(ingredients.count(), 2)
-        self.assertIn(ingredient1, ingredients)
-        self.assertIn(ingredient2, ingredients)
 
     def test_filter_recipes_by_name(self):
         """Test filter recipes by name"""
@@ -88,9 +87,9 @@ class PublicRecipeApiTests(TestCase):
         payload = {
             'name': 'Thai prawn red curry',
             'description': 'Description',
-            'ingredients': [ingredient1.id, ingredient2.id],
+            'ingredients': [{'name': ingredient1.name}, {'name': ingredient2.name}],
         }
-        res = self.client.post(RECIPES_URL, payload)
+        res = self.client.post(RECIPES_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
@@ -107,9 +106,9 @@ class PublicRecipeApiTests(TestCase):
         payload = {
             'name': 'Thai prawn red curry',
             'description': 'Description',
-            'ingredients': [ingredient1.id, ingredient2.id],
+            'ingredients': [{'name': ingredient1.name}, {'name': ingredient2.name}],
         }
-        res = self.client.post(RECIPES_URL, payload)
+        res = self.client.post(RECIPES_URL, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 

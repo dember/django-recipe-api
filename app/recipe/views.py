@@ -10,13 +10,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.RecipeSerializer
     queryset = Recipe.objects.all()
 
-    def get_serializer_class(self):
-        """Return appropriate serializer class"""
-        if self.action == 'retrieve':
-            return serializers.RecipeDetailSerializer
-
-        return self.serializer_class
-
     def get_queryset(self):
         queryset = self.queryset
 
